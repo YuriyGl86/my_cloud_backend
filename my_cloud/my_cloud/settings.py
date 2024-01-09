@@ -121,6 +121,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -142,7 +143,9 @@ CORS_ALLOWED_ORIGINS = [
 DJOSER = {
     'SERIALIZERS': {
         'user_create': 'storage.serializers.MyUserCreateSerializer',
-        'user_delete': 'storage.serializers.MyUserDeleteSerializer'
+        'user_delete': 'storage.serializers.MyUserDeleteSerializer',
+        'user': 'storage.serializers.MyUserSerializer',
+        'current_user': 'storage.serializers.MyUserSerializer',
     },
     'HIDE_USERS': False
 }
