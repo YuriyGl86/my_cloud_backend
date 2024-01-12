@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
@@ -22,14 +23,26 @@ class MyUserDeleteSerializer(serializers.Serializer):
 
 
 class MyUserSerializer(UserSerializer):
+    files_count = serializers.SerializerMethodField()
+    files_size = serializers.SerializerMethodField()
+
     class Meta:
         model = UserModel
-        fields = ['username', 'email', 'first_name', 'is_staff']
-        read_only_fields = ('username',)
+        fields = ['id', 'username', 'email', 'first_name', 'is_staff', 'files_count', 'files_size']
+        read_only_fields = ('username', 'id')
+
+    def get_files_count(self, obj):
+        return UploadFiles.objects.filter(owner=obj).count()
+
+    def get_files_size(self, obj):
+        return UploadFiles.objects.filter(owner=obj).aggregate(sum=Sum('size')).get('sum')
 
 
 class FileSerializer(ModelSerializer):
     class Meta:
         model = UploadFiles
-        fields = ('owner', 'file', 'name', 'uploaded_at', 'last_download', 'uuid', 'size')
-        read_only_fields = ['owner', 'name', 'uploaded_at', 'last_download', 'uuid', 'size']
+        fields = ('id','owner', 'file', 'name', 'uploaded_at', 'last_download', 'uuid', 'size', 'comment')
+        read_only_fields = ['id', 'owner', 'name', 'uploaded_at', 'last_download', 'uuid', 'size',]
+
+    def validate(self, data):
+        return data

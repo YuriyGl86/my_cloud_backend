@@ -11,4 +11,5 @@ class UploadFiles(models.Model):
     last_download = models.DateTimeField(blank=True, null=True)
     uuid = models.UUIDField(default=uuid.uuid4)
     size = models.BigIntegerField()
+    comment = models.CharField(max_length=256, blank=True, null=True)
 
