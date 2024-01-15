@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 from rest_framework.serializers import ModelSerializer
 
 from storage.models import UploadFiles
@@ -39,10 +40,16 @@ class MyUserSerializer(UserSerializer):
 
 
 class FileSerializer(ModelSerializer):
+    file_download_url = serializers.SerializerMethodField()
+
     class Meta:
         model = UploadFiles
-        fields = ('id','owner', 'file', 'name', 'uploaded_at', 'last_download', 'uuid', 'size', 'comment')
-        read_only_fields = ['id', 'owner', 'name', 'uploaded_at', 'last_download', 'uuid', 'size',]
+        fields = ('id','owner', 'file', 'name', 'uploaded_at', 'last_download', 'uuid', 'size', 'comment','file_download_url' )
+        read_only_fields = ['id', 'owner', 'name', 'uploaded_at', 'last_download', 'uuid', 'size', 'file_download_url']
 
     def validate(self, data):
+        self.context['request']
         return data
+
+    def get_file_download_url(self, obj):
+        return self.context['request'].build_absolute_uri(reverse('share', args=[str(obj.uuid)]))
