@@ -31,6 +31,10 @@ class FileViewSet(viewsets.ModelViewSet):
         logger.info(f"Загрузка файла. Имя файла: {file.name}, переименование: {rename}, коммент: {comment}")
         serializer.save(name=filename, size=file.size, owner=self.request.user, comment=comment)
 
+    def perform_destroy(self, instance):
+        logger.info(f"Удаление файла {instance.name}")
+        super().perform_destroy(instance)
+
     def get_queryset(self):
         user = self.request.user
         requested_user_id = self.request.query_params.get('id', None)
@@ -44,12 +48,10 @@ class FileViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(self.request, obj)
         return obj
 
-    def get_permissions(self):
-        return super().get_permissions()
-
     def perform_update(self, serializer):
         name = self.request.data.get('name', None)
         args = {}
+        logger.info(f"Редактирование файла. {self.request.data}")
         if name:
             args['name'] = name
         serializer.save(**args)
@@ -76,12 +78,11 @@ class ShareFiles(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         obj = self.get_object()
-        print(obj)
         file_type = mimetypes.guess_type(obj.name)[0]
         response = HttpResponse(obj.file.file, content_type=file_type if file_type else "application/octet-stream")
         response['Content-Disposition'] = 'inline;filename=' + obj.name
         response["Access-Control-Expose-Headers"] = "Content-Disposition"
-        logger.info(f"Скачивание файла по ссылке.")
+        logger.info(f"Свободное скачивание файла по ссылке. {obj.name}")
         obj.last_download = now()
         obj.save()
         return response
