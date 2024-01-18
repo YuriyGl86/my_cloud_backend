@@ -18,7 +18,7 @@ class MyUserCreateSerializer(UserCreateSerializer):
 
 class MyUserDeleteSerializer(serializers.Serializer):
     """
-    Для настройки djoser в settings.py. Теперь djoser при удалении user по id не требует пароль.
+    Для настройки djoser в settings.py. Теперь djoser при удалении user по id не требует пароль от этого user.
     """
     pass
 
@@ -44,12 +44,10 @@ class FileSerializer(ModelSerializer):
 
     class Meta:
         model = UploadFiles
-        fields = ('id','owner', 'file', 'name', 'uploaded_at', 'last_download', 'uuid', 'size', 'comment','file_download_url' )
+        fields = (
+            'id', 'owner', 'file', 'name', 'uploaded_at', 'last_download', 'uuid', 'size', 'comment',
+            'file_download_url')
         read_only_fields = ['id', 'owner', 'name', 'uploaded_at', 'last_download', 'uuid', 'size', 'file_download_url']
-
-    def validate(self, data):
-        self.context['request']
-        return data
 
     def get_file_download_url(self, obj):
         return self.context['request'].build_absolute_uri(reverse('share', args=[str(obj.uuid)]))

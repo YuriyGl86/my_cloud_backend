@@ -8,10 +8,10 @@ router.register(r'files', FileViewSet, basename='file')
 
 urlpatterns = [
     # path('', views.index),
-    path('api/v1/auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
-    path('api/v1/', include(router.urls)),
-    path('api/v1/share/<slug:uuid>', ShareFiles.as_view(), name='share')
+    path('', include(router.urls)),
+    path('share/<slug:uuid>', ShareFiles.as_view(), name='share')
 
 
 ]

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'djoser',
     'storage.apps.StorageConfig',
     'corsheaders',
+    'my_cloud_main.apps.MyCloudMainConfig',
 ]
 
 MIDDLEWARE = [
@@ -149,4 +150,31 @@ DJOSER = {
         'current_user': 'storage.serializers.MyUserSerializer',
     },
     'HIDE_USERS': False
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "main_format": {
+            'format': "{message}",
+            "style": "{",
+        }
+    },
+
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "main_format",
+            "level": 'INFO'
+        },
+    },
+    "loggers": {
+        "main": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        }
+    }
 }
