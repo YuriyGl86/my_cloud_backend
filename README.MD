@@ -4,6 +4,7 @@
 
    * Frontend : [GitHub Frontend](https://github.com/YuriyGl86/my_cloud_frontend)
    * Backend: [GitHub Backend](https://github.com/YuriyGl86/my_cloud_backend)
+   * Развернутый проект: http://89.111.154.149/
 
     При этом, backend-репозиторий содержит самодостаточный, полностью работоспособный код, готовый для развертывания 
 (включает в себя bild от frontend-части). Код во frontend репозитории так же полностью работоспособный, но требует 
@@ -35,15 +36,16 @@
     * ***usermod yuriy -aG sudo*** - добавляем созданного пользователя в группу суперпользователей.
     * ***logout***
     * ***ssh yuriy@89.11.171.38***  - заходим от имени созданного пользователя.
-3. #### Устанавливаем нужную версию python. Для данного приложения нужна версия 3.11.7:
-    * ***python3 --version***  - проверяем что установлено сейчас, если установлено. Если не 3.11, то продолжаем следующие шаги.
-    * ***sudo add-apt-repository ppa:deadsnakes/ppa*** - добавляем репозиторий с прошлыми версиями python.
-    * ***sudo apt install --reinstall software-properties-common***  - ЕСЛИ ПРЕДЫДУЩИЙ ШАГ ЗАКОНЧИЛСЯ ОШИБКОЙ, например, если сначала были обновлены репозитории через sudo apt update, то тогда поможет эта команда.
-    * ***sudo apt-get update***  - обновляем спсиок репозиториев.
-    * ***sudo apt-get install python3.11*** - устанавливаем нужную версию python, в данном случае 3.11.
-4. #### Обновляем список репозиториев пакетного менеджера и обновляем все до последних версий.
+3. #### Обновляем список репозиториев пакетного менеджера и обновляем все до последних версий.
     * ***sudo apt update***
-    * ***sudo apt upgrade*** - не обязательно, но желательно.
+    * ***sudo apt upgrade*** 
+4. #### Устанавливаем нужную версию python. Для данного приложения нужна версия 3.11.7:
+     * ***python3 --version*** - проверяем что установлено сейчас, если установлено. Если не 3.11, то продолжаем следующие шаги.
+     * ***sudo add-apt-repository ppa:deadsnakes/ppa*** - добавляем репозиторий с прошлыми версиями python.
+     * ***sudo apt install --reinstall software-properties-common***  - ЕСЛИ ПРЕДЫДУЩИЙ ШАГ ЗАКОНЧИЛСЯ ОШИБКОЙ "sudo: add-apt-repository: command not found", то тогда поможет эта команда. После нее повторяем предыдущий шаг.
+     * ***sudo apt-get update***  - обновляем спсиок репозиториев.
+     * ***sudo apt-get install python3.11*** - устанавливаем нужную версию python, в данном случае 3.11.
+     * ***python3.11 --version*** - проверяем, что установилась версия 3.11.7
 5. #### Устанавливаем нужные пакеты, по отдельности или одной командой.
     * ***sudo apt install python3.11-venv python3-pip postgresql nginx*** - устанавливаем виртуальное окружение для установленной версии python (3.11 в нашем случае), пакетный менеджер pip, postgresql и веб-сервер nginx.
 6. #### Создаем пользователя для работы с postgresql (не обязательно, можно использовать и пользователя postgres) и создаем базу данных для приложения.
@@ -78,19 +80,19 @@
     * ***fuser -k 8000/tcp*** - если порт занят после нештатного завершения предыдущего процесса, то эта команда убъет процесс и освободит порт.
     * ***gunicorn my_cloud.wsgi -b 0.0.0.0:8000*** - пробуем подключиться через gunicorn, указываем путь к файлу wsgi, в данном случае файл wsgi.py  лежит в папке проекта my_cloud, указываем интерфейс для отслеживания - 0.0.0.0:8000. Пробуем зайти через браузер по IP адресу сервера, указав порт.
 11. #### Настраиваем gunicorn. Делаем  gunicorn сервисом в нашей системе, т.е. был постоянно запущен и при старте системы автоматически запускался сам.
-    * ***sudo nano /etc/systemd/system/gunicorn.service*** - создаем файл настроек gunicorn-сервиса. Внутри указываем следующие настройки:
+    * ***sudo nano /etc/systemd/system/gunicorn.service*** - создаем файл настроек gunicorn-сервиса. Внутри указываем следующие настройки (Важно! При копировании, убирать лишние пробелы в конце строк!):
         ```
-        [Unit]	
-        Description=gunicorn service	
-        After=network.target	
-        [Service]	
-        User=yuriy	
-        Group=www-data	
-        WorkingDirectory=/home/yuriy/my_cloud_backend/my_cloud	
-        ExecStart=/home/yuriy/my_cloud_backend/venv/bin/gunicorn --access-logfile -\	
-        --workers=1 \	
-        --bind unix:/home/yuriy/my_cloud_backend/my_cloud/my_cloud/project.sock my_cloud.wsgi:application	
-        [Install]	
+        [Unit]
+        Description=gunicorn service
+        After=network.target
+        [Service]
+        User=yuriy
+        Group=www-data
+        WorkingDirectory=/home/yuriy/my_cloud_backend/my_cloud
+        ExecStart=/home/yuriy/my_cloud_backend/venv/bin/gunicorn --access-logfile -\
+        --workers=1 \
+        --bind unix:/home/yuriy/my_cloud_backend/my_cloud/my_cloud/project.sock my_cloud.wsgi:application
+        [Install]
         WantedBy=multi-user.target
         ```
         + В разделе `[unit]`, в котором указываются мета-данные и зависимости, прописываем описание создаваемого сервиса: `Description=gunicorn service` и `After=network.target` - указываем когда должен запускаться сервис, в нашем случае т.к. нам нужно подключение к сети, то указываем запуск после запуска сетевых служб.
@@ -104,12 +106,12 @@
         ```
         server {
             listen 80;
-            server_name 89.111.155.64;
+            server_name 89.111.154.149;
             access_log  /var/log/nginx/guni-access.log;
             error_log  /var/log/nginx/guni-error.log info;
 
             location /static/ {
-                    root home/yuriy/my_cloud_backend/my_cloud;
+                    root /home/yuriy/my_cloud_backend/my_cloud;
             }
             location / {
                     include proxy_params;
