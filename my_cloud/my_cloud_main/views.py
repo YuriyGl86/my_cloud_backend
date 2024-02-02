@@ -6,3 +6,4 @@ from django.views.generic import TemplateView
 
 class MyCloudHome(TemplateView):
     template_name = "index.html"
+

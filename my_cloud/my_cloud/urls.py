@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 
 from my_cloud import settings
+from my_cloud_main.views import MyCloudHome
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,3 +30,5 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = MyCloudHome.as_view()

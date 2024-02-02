@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 from rest_framework.serializers import ModelSerializer
 
@@ -14,6 +15,13 @@ class MyUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = UserModel
         fields = ['username', 'password', 'email', 'first_name', 'is_staff']
+
+    # def validate(self, attrs):
+    #     print(attrs)
+    #     data = super().validate(attrs)
+    #     print(data)
+    #     raise ValidationError('Ошибка валидации')
+    #     return data
 
 
 class MyUserDeleteSerializer(serializers.Serializer):
@@ -36,7 +44,8 @@ class MyUserSerializer(UserSerializer):
         return UploadFiles.objects.filter(owner=obj).count()
 
     def get_files_size(self, obj):
-        return UploadFiles.objects.filter(owner=obj).aggregate(sum=Sum('size')).get('sum')
+        size = UploadFiles.objects.filter(owner=obj).aggregate(sum=Sum('size')).get('sum')
+        return size if size else 0
 
 
 class FileSerializer(ModelSerializer):
